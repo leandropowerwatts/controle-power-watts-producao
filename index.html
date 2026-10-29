@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4513a" />
+    <meta name="description" content="Power — Controle de Produção" />
+    <title>Power — Controle de Produção</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <main id="login-screen" class="login-screen">
+      <div class="login-card">
+        <div class="brand-mark brand-mark-large" aria-hidden="true">ϟ</div>
+        <p class="eyebrow">CONTROLE INTERNO</p>
+        <h1>Power</h1>
+        <p class="login-subtitle">Controle de Produção</p>
+        <form id="login-form" class="login-form">
+          <label for="password">Senha de acesso</label>
+          <div class="password-field">
+            <input id="password" type="password" inputmode="numeric" autocomplete="current-password" placeholder="Digite sua senha" required />
+            <button id="toggle-password" type="button" class="icon-button" aria-label="Mostrar senha">◉</button>
+          </div>
+          <p id="login-error" class="form-error" hidden>Senha incorreta. Tente novamente.</p>
+          <button class="button button-primary button-wide" type="submit">Entrar no sistema <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="login-footnote">Área de uso interno</p>
+      </div>
+    </main>
+
+    <div id="app-shell" class="app-shell" hidden>
+      <header class="app-header">
+        <button id="exit-button" class="header-icon-button" type="button" aria-label="Sair">×</button>
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true">ϟ</div>
+          <div>
+            <div class="brand-name">Power</div>
+            <div class="brand-caption">Controle de Produção</div>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="chat-button" class="header-icon-button" type="button" aria-label="Abrir mensagens">◌</button>
+          <button id="share-button" class="header-icon-button" type="button" aria-label="Compartilhar">↗</button>
+        </div>
+      </header>
+
+      <nav class="tab-nav" aria-label="Navegação principal">
+        <button class="tab-button is-active" data-tab="dashboard" type="button">Painel</button>
+        <button class="tab-button" data-tab="launch" type="button">Lançar</button>
+        <button class="tab-button" data-tab="models" type="button">Modelos</button>
+        <button class="tab-button" data-tab="backup" type="button">Backup</button>
+      </nav>
+
+      <main class="page-content">
+        <section id="dashboard-section" class="tab-panel is-visible" data-panel="dashboard">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">VISÃO GERAL</p>
+              <h1>Painel de produção</h1>
+              <p id="dashboard-date" class="muted">—</p>
+            </div>
+            <button id="refresh-button" class="soft-icon-button" type="button" aria-label="Atualizar painel">↻</button>
+          </div>
+
+          <div class="stats-grid">
+            <article class="stat-card featured-stat">
+              <div class="stat-label">HOJE</div>
+              <div class="stat-main"><strong id="today-pieces">0</strong><span>peças</span></div>
+              <div id="today-value" class="stat-value">R$ 0,00</div>
+              <div id="today-detail" class="stat-detail">—</div>
+              <span id="today-badge" class="badge">sem base de comparação</span>
+            </article>
+            <article class="stat-card">
+              <div class="stat-label">ESTA SEMANA</div>
+              <div class="stat-main"><strong id="week-pieces">0</strong><span>peças</span></div>
+              <div id="week-value" class="stat-value">R$ 0,00</div>
+              <div id="week-detail" class="stat-detail">—</div>
+              <span id="week-badge" class="badge">sem base de comparação</span>
+            </article>
+            <article class="stat-card">
+              <div class="stat-label">ESTE MÊS</div>
+              <div class="stat-main"><strong id="month-pieces">0</strong><span>peças</span></div>
+              <div id="month-value" class="stat-value">R$ 0,00</div>
+              <div id="month-detail" class="stat-detail">—</div>
+              <span id="month-badge" class="badge">sem base de comparação</span>
+            </article>
+          </div>
+
+          <section class="content-card chart-card">
+            <div class="card-heading-row">
+              <div>
+                <h2>Produção por dia</h2>
+                <p class="muted">Últimos 21 dias. Toque em uma barra para ver o dia.</p>
+              </div>
+              <div class="segmented-control" role="group" aria-label="Métrica do gráfico">
+                <button class="segment-button is-active" data-metric="pieces" type="button">Peças</button>
+                <button class="segment-button" data-metric="value" type="button">Valor</button>
+              </div>
+            </div>
+            <div id="chart-summary" class="chart-summary">—</div>
+            <div id="bar-chart" class="bar-chart" aria-label="Gráfico de produção"></div>
+          </section>
+
+          <section class="content-card comparison-card">
+            <div class="section-kicker">COMPARATIVO</div>
+            <h2>Compare seus períodos</h2>
+            <p id="comparison-copy" class="muted">Os períodos são comparados com o intervalo equivalente anterior. À medida que você registra novos lançamentos, a evolução aparece aqui automaticamente.</p>
+          </section>
+
+          <section class="content-card">
+            <div class="card-heading-row compact-heading">
+              <div>
+                <div class="section-kicker">DISTRIBUIÇÃO</div>
+                <h2>Por modelo no mês</h2>
+              </div>
+              <span id="model-month-total" class="total-label">0 peças</span>
+            </div>
+            <div id="model-breakdown" class="model-breakdown"></div>
+          </section>
+
+          <section class="content-card table-card">
+            <div class="section-kicker">HISTÓRICO</div>
+            <h2>Últimos dias com produção</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>DIA</th><th>PEDIDOS</th><th>PEÇAS</th><th>VALOR</th></tr>
+                </thead>
+                <tbody id="latest-days-body"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section id="launch-section" class="tab-panel" data-panel="launch">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">NOVO REGISTRO</p>
+              <h1>Lançar produção</h1>
+              <p class="muted">Registre as peças produzidas e acompanhe seus totais.</p>
+            </div>
+          </div>
+          <section class="content-card form-card">
+            <form id="launch-form">
+              <div class="form-grid">
+                <label>Dia<input id="launch-date" type="date" required /></label>
+                <label>Nº do pedido<input id="order-number" type="text" placeholder="Ex.: 4231" required /></label>
+                <label>Modelo da peça<select id="launch-model" required></select></label>
+                <label>Quantidade de peças<input id="quantity" type="number" min="1" step="1" placeholder="Ex.: 120" required /></label>
+              </div>
+              <div class="launch-total">Valor deste lançamento: <strong id="launch-total">R$ 0,00</strong></div>
+              <button class="button button-primary button-wide" type="submit">Registrar produção <span aria-hidden="true">→</span></button>
+            </form>
+          </section>
+          <div id="launch-feedback" class="success-message" hidden></div>
+          <section class="content-card table-card">
+            <div class="card-heading-row compact-heading">
+              <div>
+                <div class="section-kicker">MOVIMENTAÇÕES</div>
+                <h2>Lançamentos do dia</h2>
+              </div>
+              <span id="day-total" class="total-label">Total do dia: 0</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>PEDIDO</th><th>MODELO</th><th>QTD.</th><th>VALOR UN.</th></tr></thead>
+                <tbody id="day-entries-body"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section id="models-section" class="tab-panel" data-panel="models">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">CATÁLOGO</p>
+              <h1>Modelos de peça</h1>
+              <p class="muted">Cadastre os modelos e o valor pago por peça.</p>
+            </div>
+          </div>
+          <section class="content-card form-card">
+            <form id="model-form">
+              <div class="form-grid model-form-grid">
+                <label>Nome do modelo<input id="model-name" type="text" placeholder="Ex.: Placa só mica 230x130" required /></label>
+                <label>Valor por peça (R$)<input id="model-price" type="number" min="0" step="0.01" placeholder="45,00" required /></label>
+              </div>
+              <button class="button button-primary" type="submit">Adicionar modelo <span aria-hidden="true">+</span></button>
+            </form>
+          </section>
+          <div id="model-feedback" class="success-message" hidden></div>
+          <section class="content-card table-card">
+            <div class="section-kicker">MODELOS CADASTRADOS</div>
+            <h2>Valores por peça</h2>
+            <div class="table-wrap">
+              <table class="models-table">
+                <thead><tr><th>MODELO</th><th>VALOR POR PEÇA</th><th></th></tr></thead>
+                <tbody id="models-body"></tbody>
+              </table>
+            </div>
+            <p id="empty-models" class="empty-state" hidden>Nenhum modelo cadastrado ainda.</p>
+          </section>
+        </section>
+
+        <section id="backup-section" class="tab-panel" data-panel="backup">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">PORTABILIDADE</p>
+              <h1>Backup</h1>
+              <p class="muted">Os dados são salvos neste navegador. Copie o texto para guardar uma cópia.</p>
+            </div>
+          </div>
+          <section class="content-card backup-card">
+            <div class="section-kicker">COPIAR E RESTAURAR</div>
+            <h2>Dados do sistema</h2>
+            <p class="muted">Você pode guardar este JSON em um arquivo ou restaurá-lo em outro navegador.</p>
+            <textarea id="backup-text" spellcheck="false" aria-label="Conteúdo do backup"></textarea>
+            <div class="backup-actions">
+              <button id="copy-backup" class="button button-secondary" type="button">Copiar backup</button>
+              <button id="restore-backup" class="button button-secondary" type="button">Restaurar do texto</button>
+            </div>
+          </section>
+          <section class="content-card danger-card">
+            <div>
+              <div class="section-kicker danger-kicker">ZONA DE CUIDADO</div>
+              <h2>Apagar tudo</h2>
+              <p class="muted">Remove modelos e lançamentos deste navegador. Esta ação não pode ser desfeita.</p>
+            </div>
+            <button id="clear-all" class="button button-danger" type="button">Apagar dados</button>
+          </section>
+        </section>
+      </main>
+    </div>
+    <script src="./app.js"></script>
+  </body>
+</html>
