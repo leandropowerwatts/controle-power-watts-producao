@@ -257,8 +257,8 @@ function renderDayEntries() {
   $('#day-total').textContent = `Total do dia: ${number.format(total.pieces)}`;
   $('#day-entries-body').innerHTML = entries.length ? entries.map((entry) => {
     const model = getModel(entry.modelId);
-    return `<tr><td>${escapeHtml(entry.order)}</td><td>${escapeHtml(model?.name || 'Modelo removido')}</td><td>${number.format(entry.quantity)}</td><td>${formatMoney(model?.price || 0)}</td></tr>`;
-  }).join('') : '<tr><td colspan="4" class="empty-state">Nenhum lançamento para este dia</td></tr>';
+    return `<tr><td>${escapeHtml(entry.order)}</td><td>${escapeHtml(model?.name || 'Modelo removido')}</td><td>${number.format(entry.quantity)}</td><td>${formatMoney(model?.price || 0)}</td><td><button class="delete-entry" data-delete-entry="${entry.id}" type="button">Excluir</button></td></tr>`;
+  }).join('') : '<tr><td colspan="5" class="empty-state">Nenhum lançamento para este dia</td></tr>';
 }
 
 function updateLaunchTotal() {
@@ -363,6 +363,20 @@ $('#launch-form').addEventListener('submit', (event) => {
 $('#launch-date').addEventListener('change', renderDayEntries);
 $('#launch-model').addEventListener('change', updateLaunchTotal);
 $('#quantity').addEventListener('input', updateLaunchTotal);
+
+$('#day-entries-body').addEventListener('click', (event) => {
+  const button = event.target.closest('[data-delete-entry]');
+  if (!button) return;
+  const entry = state.entries.find((item) => item.id === button.dataset.deleteEntry);
+  if (!entry) return;
+  const model = getModel(entry.modelId);
+  const label = `${entry.quantity} x ${model?.name || 'modelo removido'} (pedido ${entry.order})`;
+  if (!window.confirm(`Excluir o lançamento ${label}?`)) return;
+  state.entries = state.entries.filter((item) => item.id !== entry.id);
+  saveState();
+  renderAll();
+  showToast('Lançamento excluído.');
+});
 
 $('#model-form').addEventListener('submit', (event) => {
   event.preventDefault();
